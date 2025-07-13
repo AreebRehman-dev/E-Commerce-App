@@ -18,6 +18,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import toast from 'react-hot-toast';
 
 import { addItem, updateItem, removeItem } from './cartHelpers';
 
@@ -83,6 +84,7 @@ const Card = ({
   const addToCart = () => {
     // console.log('added');
     addItem(product, setRedirect(true));
+    toast.success('Product added to cart')
   };
 
   const shouldRedirect = (redirect) => {
