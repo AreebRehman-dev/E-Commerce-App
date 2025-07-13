@@ -49,17 +49,17 @@ const Cart = () => {
         className='container-fluid'
       >
         <div className='row'>
-          <div className='col-md-1'></div>
-          <div className='col-md-4'>
+          <div className='col-xl-1 col-lg-1'></div>
+          <div className='col-xl-4 col-lg-5'>
             {items.length > 0 ? showItems(items) : noItemsMessage()}
           </div>
-          <div className='col-md-1'></div>
-          <div className='col-md-5'>
+          <div className='col-xl-1 col-lg-1 removediv'></div>
+          <div className='col-xl-5 col-lg-5'>
             <h2 className='mb-4'>Your cart summary</h2>
             <hr />
             <Checkout products={items} setRun={setRun} run={run} />
           </div>
-          <div className='col-md-1'></div>
+          <div className='col-xl-1 col-lg-1'></div>
         </div>
 
       </Layout>

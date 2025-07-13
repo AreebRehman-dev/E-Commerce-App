@@ -194,8 +194,8 @@ const AddProduct = () => {
       title='Add a new product'
       description={`Hey ${user.name}, ready to add a new product?`}
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
+      <div className='row div-main'>
+        <div className='col-md-8 offset-md-2 div-inner'>
           {showLoading()}
           {showSuccess()}
           {showError()}

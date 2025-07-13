@@ -74,8 +74,8 @@ const AddCategory = () => {
       title='Add a new category'
       description={`Hey ${user.name}, ready to add a new category?`}
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
+      <div className='row div-main'>
+        <div className='col-md-8 offset-md-2 div-inner'>
           {showSuccess()}
           {showError()}
           {newCategoryForm()}

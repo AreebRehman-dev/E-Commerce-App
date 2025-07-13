@@ -327,3 +327,83 @@ header.MuiPaper-root.MuiAppBar-root.MuiAppBar-positionFixed.MuiAppBar-colorPrima
 h6.MuiTypography-root.makeStyles-title-7.MuiTypography-h6.MuiTypography-noWrap {
   color: #000;
 }
+h1.text-danger.display-2 {
+  font-size: 3rem;
+}
+
+.order-div-main {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.order-div-inner {
+  width: 90%;
+  margin: 0px !important;
+}
+.curserpoiner {
+  cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+  .removediv {
+    display: none;
+  }
+}
+
+@media (max-width: 959px) {
+  .mobile-menu-m a,
+  .mobile-menu-m span {
+    color: #000 !important;
+  }
+}
+@media (min-width: 959px) {
+  #primary-search-account-menu-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .orderidtext {
+    font-size: 1.6rem;
+  }
+  .order-div-inner {
+    margin: 0px !important;
+  }
+  .div-main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .div-inner {
+    width: 90%;
+    margin: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-column {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .footer-bottom {
+    flex-direction: column;
+  }
+  .jumbotron h2 {
+    font-size: 2.5rem !important;
+  }
+  .textcenter {
+    font-size: 2.1rem !important;
+  }
+  .orderidtext {
+    font-size: 1.4rem;
+  }
+  h1.text-danger.display-2 {
+    font-size: 2.4rem;
+  }
+  .order-div-inner {
+    margin: 0px !important;
+    padding-right: 0px !important;
+  }
+}

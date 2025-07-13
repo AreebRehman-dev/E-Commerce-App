@@ -3,6 +3,7 @@ import Layout from '../core/Layout';
 import { isAuthenticated } from '../auth';
 import { listOrders, getStatusValues, updateOrderStatus } from './apiAdmin';
 import moment from 'moment';
+import "../styles.css"
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -86,8 +87,8 @@ const Orders = () => {
       title='Orders'
       description={`Hey ${user.name}, you can manage all the ordes here`}
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
+      <div className='row order-div-main'>
+        <div className='col-md-8  order-div-inner'>
           {showOrdersLength()}
 
           {orders.map((o, oIndex) => {
@@ -98,7 +99,7 @@ const Orders = () => {
                 style={{ borderBottom: '5px solid indigo' }}
               >
                 <h2 className='mb-5'>
-                  <span className='bg-primary'>Order ID: {o._id}</span>
+                  <span className='bg-primary orderidtext'>Order ID: {o._id}</span>
                 </h2>
 
                 <ul className='list-group mb-2'>

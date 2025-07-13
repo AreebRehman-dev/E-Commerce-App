@@ -71,13 +71,14 @@ exports.create = async (req, res) => {
 // Delete a product
 exports.remove = async (req, res) => {
   try {
-    let product = req.product;
-    await product.remove();
+    await Product.deleteOne({ _id: req.product._id });
     res.json({ message: 'Product deleted successfully' });
   } catch (err) {
-    return res.status(400).json({ error: errorHandler(err) });
+    console.error("DELETE ERROR:", err);
+    res.status(400).json({ error: err.message });
   }
 };
+
 
 // Update a product
 exports.update = async (req, res) => {
