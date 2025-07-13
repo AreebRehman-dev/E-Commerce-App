@@ -287,7 +287,7 @@ const MaterialAppBar = ({ history }) => {
 
             <Link style={isActive(history, '/cart')} to='/cart'>
               <IconButton aria-label='Cart' color='inherit'>
-                <Badge badgeContent={itemTotal()} color='secondary'>
+                <Badge >
                   <ShoppingCartIcon />
                 </Badge>
                 <Typography noWrap>Cart</Typography>
