@@ -191,7 +191,7 @@ const Card = ({
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={12}>
           <CardM className={classes.card}>
-            {shouldRedirect(redirect)}
+            {/* {shouldRedirect(redirect)} */}
             <ShowImage item={product} url='product' />
             <CardContent className={classes.cardContent}>
               <Typography gutterBottom variant='h5' component='h2'>
