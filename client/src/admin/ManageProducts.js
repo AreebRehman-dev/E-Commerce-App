@@ -53,14 +53,12 @@ const ManageProducts = () => {
                 <Link to={`/admin/product/update/${p._id}`}>
                   <span className='badge badge-warning badge-pill'>Update</span>
                 </Link>
-                <Link>
-                  <span
-                    onClick={() => destroy(p._id)}
-                    className='badge badge-danger badge-pill'
-                  >
-                    Delete
-                  </span>
-                </Link>
+                <span
+                  onClick={() => destroy(p._id)}
+                  className='badge badge-danger badge-pill curserpoiner'
+                >
+                  Delete
+                </span>
               </li>
             ))}
           </ul>

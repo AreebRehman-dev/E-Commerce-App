@@ -148,7 +148,7 @@ const MaterialAppBar = ({ history }) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <div style={{ backgroundColor: '#404040' }}>
+      <div className='mobile-menu-m' style={{ backgroundColor: '#fff' }}>
         <MenuItem>
           <Link style={isActive(history, '/')} to='/'>
             <IconButton aria-label='Home' color='inherit'>
@@ -263,7 +263,7 @@ const MaterialAppBar = ({ history }) => {
               <StoreIcon />
             </IconButton>
           </a>
-          <a href='/' style={{ color: '#ffffff', textDecoration: 'none' }}>
+          <a href='/' style={{ color: '#000', textDecoration: 'none' }}>
             <Typography className={classes.title} variant='h6' noWrap>
               BRAND
             </Typography>

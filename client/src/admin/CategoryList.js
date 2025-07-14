@@ -27,8 +27,8 @@ const CategoryList = () => {
       title='Category List'
       description={`Hey ${user.name} ready to manage categories?`}
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
+      <div className='row div-main'>
+        <div className='col-md-8 offset-md-2 div-inner'>
           <h2 className='text-center'>Total {categories.length} categories</h2>
           <hr />
           <ul className='list-group'>

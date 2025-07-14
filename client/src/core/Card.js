@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   productDescription: {
-    height: '100px',
+    height: '50px',
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
