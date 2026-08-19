@@ -5,8 +5,11 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const dns = require('dns');
 const expressValidator = require('express-validator');
 require('dotenv').config();
+
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 // import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');

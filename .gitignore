@@ -1,7 +1,17 @@
-/nbproject/
-/.idea/*
+node_modules/
+.env
+dist/
+build/
+
+# IDE
+.idea/
+
+# Sublime Text
 *.tmlanguage.cache
 *.tmPreferences.cache
 *.stTheme.cache
 *.sublime-workspace
 *.sublime-project
+
+# NetBeans
+nbproject/
