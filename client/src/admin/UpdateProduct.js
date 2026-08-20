@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../core/Layout';
 import { isAuthenticated } from '../auth';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { getProduct, getCategories, updateProduct } from './apiAdmin';
+
+import PhotoCameraIcon from '@material-ui/icons/PhotoCamera';
+import SaveIcon from '@material-ui/icons/Save';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const UpdateProduct = ({ match }) => {
   const [values, setValues] = useState({
@@ -27,9 +34,6 @@ const UpdateProduct = ({ match }) => {
     name,
     description,
     price,
-    // categories,
-    // category,
-    // shipping,
     quantity,
     loading,
     error,
@@ -38,42 +42,45 @@ const UpdateProduct = ({ match }) => {
     formData,
   } = values;
 
-  const init = (productId) => {
-    getProduct(productId).then((data) => {
-      if (data.error) {
-        setValues({ ...values, error: data.error });
-      } else {
-        // populate the state
-        setValues({
-          ...values,
-          name: data.name,
-          description: data.description,
-          price: data.price,
-          category: data.category._id,
-          shipping: data.shipping,
-          quantity: data.quantity,
-          formData: new FormData(),
-        });
-        // load categories
-        initCategories();
-      }
-    });
-  };
-
   // load categories and set form data
-  const initCategories = () => {
+  const initCategories = useCallback(() => {
     getCategories().then((data) => {
       if (data.error) {
-        setValues({ ...values, error: data.error });
+        setValues((prev) => ({ ...prev, error: data.error }));
       } else {
         setCategories(data);
       }
     });
-  };
+  }, []);
+
+  const init = useCallback(
+    (productId) => {
+      getProduct(productId).then((data) => {
+        if (data.error) {
+          setValues((prev) => ({ ...prev, error: data.error }));
+        } else {
+          // populate the state
+          setValues((prev) => ({
+            ...prev,
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            category: data.category._id,
+            shipping: data.shipping,
+            quantity: data.quantity,
+            formData: new FormData(),
+          }));
+          // load categories
+          initCategories();
+        }
+      });
+    },
+    [initCategories]
+  );
 
   useEffect(() => {
     init(match.params.productId);
-  }, []);
+  }, [init, match.params.productId]);
 
   const handleChange = (name) => (event) => {
     const value = name === 'photo' ? event.target.files[0] : event.target.value;
@@ -85,129 +92,153 @@ const UpdateProduct = ({ match }) => {
     event.preventDefault();
     setValues({ ...values, error: '', loading: true });
 
-    updateProduct(match.params.productId, user._id, token, formData).then(
-      (data) => {
-        if (data.error) {
-          setValues({ ...values, error: data.error });
-        } else {
-          setValues({
-            ...values,
-            name: '',
-            description: '',
-            photo: '',
-            price: '',
-            quantity: '',
-            loading: false,
-            error: false,
-            redirectToProfile: true,
-            createdProduct: data.name,
-          });
-        }
+    updateProduct(match.params.productId, user._id, token, formData).then((data) => {
+      if (data.error) {
+        setValues({ ...values, error: data.error });
+      } else {
+        setValues({
+          ...values,
+          name: '',
+          description: '',
+          photo: '',
+          price: '',
+          quantity: '',
+          loading: false,
+          error: false,
+          redirectToProfile: true,
+          createdProduct: data.name,
+        });
       }
-    );
+    });
   };
 
   const newPostForm = () => (
-    <form className='mb-3' onSubmit={clickSubmit}>
-      <h4>Post Photo</h4>
-      <div className='form-group'>
-        <label className='btn btn-secondary'>
-          <input
-            onChange={handleChange('photo')}
-            type='file'
-            name='photo'
-            accept='image/*'
-          />
+    <form onSubmit={clickSubmit}>
+      <div className='field'>
+        <span className='field-label'>Post Photo</span>
+        <label className='filedrop'>
+          <span className='filedrop-icon'>
+            <PhotoCameraIcon />
+          </span>
+          <span className='filedrop-text'>
+            <strong>Choose an image</strong>
+            <span>
+              {values.photo && values.photo.name ? values.photo.name : 'PNG, JPG or GIF'}
+            </span>
+          </span>
+          <input onChange={handleChange('photo')} type='file' name='photo' accept='image/*' />
         </label>
       </div>
 
-      <div className='form-group'>
-        <label className='text-muted'>Name</label>
+      <div className='field'>
+        <label className='field-label' htmlFor='update-name'>
+          Name
+        </label>
         <input
+          id='update-name'
           onChange={handleChange('name')}
           type='text'
-          className='form-control'
+          className='input'
           value={name}
         />
       </div>
 
-      <div className='form-group'>
-        <label className='text-muted'>Description</label>
+      <div className='field'>
+        <label className='field-label' htmlFor='update-description'>
+          Description
+        </label>
         <textarea
+          id='update-description'
           onChange={handleChange('description')}
-          className='form-control'
+          className='textarea'
           value={description}
         />
       </div>
 
-      <div className='form-group'>
-        <label className='text-muted'>Price</label>
-        <input
-          onChange={handleChange('price')}
-          type='number'
-          className='form-control'
-          value={price}
-        />
+      <div className='field-row'>
+        <div className='field'>
+          <label className='field-label' htmlFor='update-price'>
+            Price
+          </label>
+          <input
+            id='update-price'
+            onChange={handleChange('price')}
+            type='number'
+            className='input'
+            value={price}
+          />
+        </div>
+
+        <div className='field'>
+          <label className='field-label' htmlFor='update-quantity'>
+            Quantity
+          </label>
+          <input
+            id='update-quantity'
+            onChange={handleChange('quantity')}
+            type='number'
+            className='input'
+            value={quantity}
+          />
+        </div>
       </div>
 
-      <div className='form-group'>
-        <label className='text-muted'>Category</label>
-        <select onChange={handleChange('category')} className='form-control'>
-          <option>Please select</option>
-          {categories &&
-            categories.map((c, i) => (
-              <option key={i} value={c._id}>
-                {c.name}
-              </option>
-            ))}
-        </select>
+      <div className='field-row'>
+        <div className='field'>
+          <label className='field-label' htmlFor='update-category'>
+            Category
+          </label>
+          <select id='update-category' onChange={handleChange('category')} className='select'>
+            <option>Please select</option>
+            {categories &&
+              categories.map((c, i) => (
+                <option key={i} value={c._id}>
+                  {c.name}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <div className='field'>
+          <label className='field-label' htmlFor='update-shipping'>
+            Shipping
+          </label>
+          <select id='update-shipping' onChange={handleChange('shipping')} className='select'>
+            <option>Please select</option>
+            <option value='0'>No</option>
+            <option value='1'>Yes</option>
+          </select>
+        </div>
       </div>
 
-      <div className='form-group'>
-        <label className='text-muted'>Shipping</label>
-        <select onChange={handleChange('shipping')} className='form-control'>
-          <option>Please select</option>
-          <option value='0'>No</option>
-          <option value='1'>Yes</option>
-        </select>
-      </div>
-
-      <div className='form-group'>
-        <label className='text-muted'>Quantity</label>
-        <input
-          onChange={handleChange('quantity')}
-          type='number'
-          className='form-control'
-          value={quantity}
-        />
-      </div>
-
-      <button className='btn btn-outline-primary'>Update Product</button>
+      <button className='btn-x btn-x--primary' disabled={loading}>
+        <SaveIcon />
+        Update Product
+      </button>
     </form>
   );
 
-  const showError = () => (
-    <div
-      className='alert alert-danger'
-      style={{ display: error ? '' : 'none' }}
-    >
-      {error}
-    </div>
-  );
+  const showError = () =>
+    error ? (
+      <div className='notice notice--error'>
+        <ErrorOutlineIcon />
+        <p>{error}</p>
+      </div>
+    ) : null;
 
-  const showSuccess = () => (
-    <div
-      className='alert alert-info'
-      style={{ display: createdProduct ? '' : 'none' }}
-    >
-      <h2>{`${createdProduct}`} is updated!</h2>
-    </div>
-  );
+  const showSuccess = () =>
+    createdProduct ? (
+      <div className='notice notice--success'>
+        <CheckCircleIcon />
+        <p>{`${createdProduct}`} is updated!</p>
+      </div>
+    ) : null;
 
   const showLoading = () =>
     loading && (
-      <div className='alert alert-success'>
-        <h2>Loading...</h2>
+      <div className='notice notice--info'>
+        <CircularProgress size={18} color='inherit' />
+        <p>Loading...</p>
       </div>
     );
 
@@ -223,13 +254,27 @@ const UpdateProduct = ({ match }) => {
     <Layout
       title='Add a new product'
       description={`G'day ${user.name}, ready to add a new product?`}
+      crumb='Update product'
+      actions={
+        <Link to='/admin/products' className='btn-x btn-x--outline'>
+          <ArrowBackIcon />
+          Manage Products
+        </Link>
+      }
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
+      <div className='section section--sm'>
+        <div className='shell shell--narrow' style={{ padding: 0 }}>
           {showLoading()}
           {showSuccess()}
           {showError()}
-          {newPostForm()}
+
+          <div className='panel'>
+            <div className='panel-head'>
+              <h3>Product details</h3>
+            </div>
+            <div className='panel-body'>{newPostForm()}</div>
+          </div>
+
           {redirectUser()}
         </div>
       </div>

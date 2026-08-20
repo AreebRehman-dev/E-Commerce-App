@@ -3,6 +3,8 @@ import Layout from './Layout';
 import { read, listRelated } from './apiCore';
 import Card from './Card';
 
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+
 const Product = (props) => {
   const [product, setProduct] = useState({});
   const [relatedProduct, setRelatedProduct] = useState([]);
@@ -37,26 +39,46 @@ const Product = (props) => {
       description={
         product && product.description && product.description.substring(0, 100)
       }
-      className='container-fluid'
+      crumb='Product'
     >
-      <div className='row'>
-        <div className='col-md-2'></div>
-        <div className='col-md-4 col-sm-12'>
-          <h4>Product Details</h4>
-          {product && product.description && (
-            <Card product={product} showViewProductButton={false} />
-          )}
-        </div>
+      <div className='section'>
+        {error && (
+          <div className='notice notice--error'>
+            <ErrorOutlineIcon />
+            <p>{error}</p>
+          </div>
+        )}
 
-        <div className='col-md-4'>
-          <h4>Related products</h4>
-          {relatedProduct.map((p, i) => (
-            <div className='mb-3' key={i}>
-              <Card product={p} />
+        <div className='pdp-layout'>
+          <section>
+            <div className='section-head' style={{ marginBottom: 20 }}>
+              <h2 className='section-title'>Product Details</h2>
             </div>
-          ))}
+
+            {product && product.description ? (
+              <Card product={product} showViewProductButton={false} layout='feature' />
+            ) : (
+              <div className='sk-card'>
+                <div className='sk sk-media' />
+                <div className='sk sk-line sk-line--lg' />
+                <div className='sk sk-line' />
+                <div className='sk sk-line sk-line--sm' />
+              </div>
+            )}
+          </section>
+
+          <aside>
+            <div className='section-head' style={{ marginBottom: 20 }}>
+              <h2 className='section-title'>Related products</h2>
+            </div>
+
+            <div className='cart-list'>
+              {relatedProduct.map((p, i) => (
+                <Card key={i} product={p} />
+              ))}
+            </div>
+          </aside>
         </div>
-        <div className='col-md-2'></div>
       </div>
     </Layout>
   );

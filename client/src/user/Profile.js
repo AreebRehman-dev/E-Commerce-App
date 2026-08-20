@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../core/Layout';
 import { isAuthenticated } from '../auth';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { read, update, updateUser } from './apiUser';
+
+import SaveIcon from '@material-ui/icons/Save';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const Profile = ({ match }) => {
   const [values, setValues] = useState({
@@ -16,20 +19,22 @@ const Profile = ({ match }) => {
   const { token } = isAuthenticated();
   const { name, email, password, success } = values;
 
-  const init = (userId) => {
-    // console.log(userId);
-    read(userId, token).then((data) => {
-      if (data.error) {
-        setValues({ ...values, error: true });
-      } else {
-        setValues({ ...values, name: data.name, email: data.email });
-      }
-    });
-  };
+  const init = useCallback(
+    (userId) => {
+      read(userId, token).then((data) => {
+        if (data.error) {
+          setValues((prev) => ({ ...prev, error: true }));
+        } else {
+          setValues((prev) => ({ ...prev, name: data.name, email: data.email }));
+        }
+      });
+    },
+    [token]
+  );
 
   useEffect(() => {
     init(match.params.userId);
-  }, []);
+  }, [init, match.params.userId]);
 
   const handleChange = (name) => (e) => {
     setValues({ ...values, error: false, [name]: e.target.value });
@@ -37,23 +42,20 @@ const Profile = ({ match }) => {
 
   const clickSubmit = (e) => {
     e.preventDefault();
-    update(match.params.userId, token, { name, email, password }).then(
-      (data) => {
-        if (data.error) {
-          // console.log(data.error);
-          alert(data.error);
-        } else {
-          updateUser(data, () => {
-            setValues({
-              ...values,
-              name: data.name,
-              email: data.email,
-              success: true,
-            });
+    update(match.params.userId, token, { name, email, password }).then((data) => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        updateUser(data, () => {
+          setValues({
+            ...values,
+            name: data.name,
+            email: data.email,
+            success: true,
           });
-        }
+        });
       }
-    );
+    });
   };
 
   const redirectUser = (success) => {
@@ -64,35 +66,47 @@ const Profile = ({ match }) => {
 
   const profileUpdate = (name, email, password) => (
     <form>
-      <div className='form-group'>
-        <label className='text-muted'>Name</label>
+      <div className='field'>
+        <label className='field-label' htmlFor='profile-name'>
+          Name
+        </label>
         <input
+          id='profile-name'
           type='text'
           onChange={handleChange('name')}
-          className='form-control'
+          className='input'
           value={name}
         />
       </div>
-      <div className='form-group'>
-        <label className='text-muted'>Email</label>
+
+      <div className='field'>
+        <label className='field-label' htmlFor='profile-email'>
+          Email
+        </label>
         <input
+          id='profile-email'
           type='email'
           onChange={handleChange('email')}
-          className='form-control'
+          className='input'
           value={email}
         />
       </div>
-      <div className='form-group'>
-        <label className='text-muted'>Password</label>
+
+      <div className='field'>
+        <label className='field-label' htmlFor='profile-password'>
+          Password
+        </label>
         <input
+          id='profile-password'
           type='password'
           onChange={handleChange('password')}
-          className='form-control'
+          className='input'
           value={password}
         />
       </div>
 
-      <button onClick={clickSubmit} className='btn btn-primary'>
+      <button onClick={clickSubmit} className='btn-x btn-x--primary'>
+        <SaveIcon />
         Submit
       </button>
     </form>
@@ -102,11 +116,27 @@ const Profile = ({ match }) => {
     <Layout
       title='Profile'
       description='Update your profile'
-      className='container-fluid'
+      crumb='Profile'
+      actions={
+        <Link className='btn-x btn-x--outline' to='/user/dashboard'>
+          <ArrowBackIcon />
+          Back to Dashboard
+        </Link>
+      }
     >
-      <h2 className='mb-4'>Profile update</h2>
-      {profileUpdate(name, email, password)}
-      {redirectUser(success)}
+      <div className='section section--sm'>
+        <div className='shell shell--narrow' style={{ padding: 0 }}>
+          <div className='panel'>
+            <div className='panel-head'>
+              <h3>Profile update</h3>
+            </div>
+            <div className='panel-body'>
+              {profileUpdate(name, email, password)}
+              {redirectUser(success)}
+            </div>
+          </div>
+        </div>
+      </div>
     </Layout>
   );
 };

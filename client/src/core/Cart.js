@@ -5,7 +5,8 @@ import { getCart } from './cartHelpers';
 import Card from './Card';
 import Checkout from './Checkout';
 
-import Copyright from './Copyright';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 
 const Cart = () => {
   const [items, setItems] = useState([]);
@@ -17,54 +18,63 @@ const Cart = () => {
 
   const showItems = (items) => {
     return (
-      <div>
-        <h2>Your cart has {`${items.length}`} items</h2>
-        <hr />
-        {items.map((product, i) => (
-          <Card
-            key={i}
-            product={product}
-            showAddToCartButton={false}
-            cartUpdate={true}
-            showRemoveProductButton={true}
-            setRun={setRun}
-            run={run}
-          />
-        ))}
-      </div>
+      <section>
+        <div className='section-head' style={{ marginBottom: 20 }}>
+          <h2 className='section-title'>Your cart has {`${items.length}`} items</h2>
+        </div>
+
+        <div className='cart-list'>
+          {items.map((product, i) => (
+            <Card
+              key={i}
+              product={product}
+              layout='row'
+              showAddToCartButton={false}
+              cartUpdate={true}
+              showRemoveProductButton={true}
+              setRun={setRun}
+              run={run}
+            />
+          ))}
+        </div>
+      </section>
     );
   };
 
   const noItemsMessage = () => (
-    <h2>
-      Your cart is empty. <br /> <Link to='/shop'>Continue shopping</Link>
-    </h2>
+    <div className='empty'>
+      <span className='empty-icon'>
+        <ShoppingCartIcon />
+      </span>
+      <h3>Your cart is empty.</h3>
+      <Link className='btn-x btn-x--primary' to='/shop'>
+        Continue shopping
+        <ArrowForwardIcon />
+      </Link>
+    </div>
   );
 
   return (
-    <>
-      <Layout
-        title='Shopping Cart'
-        description='Manage your cart items. Add remove checkout or continue shopping.'
-        className='container-fluid'
-      >
-        <div className='row'>
-          <div className='col-xl-1 col-lg-1'></div>
-          <div className='col-xl-4 col-lg-5'>
-            {items.length > 0 ? showItems(items) : noItemsMessage()}
-          </div>
-          <div className='col-xl-1 col-lg-1 removediv'></div>
-          <div className='col-xl-5 col-lg-5'>
-            <h2 className='mb-4'>Your cart summary</h2>
-            <hr />
-            <Checkout products={items} setRun={setRun} run={run} />
-          </div>
-          <div className='col-xl-1 col-lg-1'></div>
-        </div>
+    <Layout
+      title='Shopping Cart'
+      description='Manage your cart items. Add remove checkout or continue shopping.'
+      crumb='Cart'
+    >
+      <div className='section'>
+        <div className='cart-layout'>
+          <div>{items.length > 0 ? showItems(items) : noItemsMessage()}</div>
 
-      </Layout>
-      <Copyright />
-    </>
+          <aside className='panel panel--sticky'>
+            <div className='panel-head'>
+              <h3>Your cart summary</h3>
+            </div>
+            <div className='panel-body'>
+              <Checkout products={items} setRun={setRun} run={run} />
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Layout>
   );
 };
 

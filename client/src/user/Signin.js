@@ -1,40 +1,16 @@
 import React, { useState } from 'react';
 import { Redirect, Link } from 'react-router-dom';
 import Layout from '../core/Layout';
-import Avatar from '@material-ui/core/Avatar';
+
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-import Copyright from '../core/Copyright';
 import { signin, authenticate, isAuthenticated } from '../auth';
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 export default function Signin() {
   const [values, setValues] = useState({
@@ -69,19 +45,19 @@ export default function Signin() {
     });
   };
 
-  const showError = () => (
-    <div
-      className='alert alert-danger'
-      style={{ display: error ? '' : 'none' }}
-    >
-      {error}
-    </div>
-  );
+  const showError = () =>
+    error ? (
+      <div className='notice notice--error'>
+        <ErrorOutlineIcon />
+        <p>{error}</p>
+      </div>
+    ) : null;
 
   const showLoading = () =>
     loading && (
-      <div className='alert alert-info'>
-        <h2>Loading...</h2>
+      <div className='notice notice--info'>
+        <CircularProgress size={18} color='inherit' />
+        <p>Loading...</p>
       </div>
     );
 
@@ -98,22 +74,21 @@ export default function Signin() {
     }
   };
 
-  const classes = useStyles();
-
   const signInForm = () => (
-    <Container component='main' maxWidth='xs'>
-      {showError()}
-      {showLoading()}
-      {redirectUser()}
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component='h1' variant='h5'>
-          Sign in
-        </Typography>
-        <form className={classes.form} noValidate>
+    <div className='auth-wrap'>
+      <div className='auth-card fade-in'>
+        <div className='auth-head'>
+          <span className='auth-badge'>
+            <LockOutlinedIcon />
+          </span>
+          <h2>Sign in</h2>
+        </div>
+
+        {showError()}
+        {showLoading()}
+        {redirectUser()}
+
+        <form noValidate>
           <TextField
             variant='outlined'
             margin='normal'
@@ -141,48 +116,44 @@ export default function Signin() {
             value={password}
             autoComplete='current-password'
           />
-          <FormControlLabel
-            control={<Checkbox value='remember' color='primary' />}
-            label='Remember me'
-          />
+
+          <div className='auth-meta'>
+            <FormControlLabel
+              control={<Checkbox value='remember' color='primary' size='small' />}
+              label='Remember me'
+            />
+            <a className='link-muted' href='#top'>
+              Forgot password?
+            </a>
+          </div>
+
           <Button
             onClick={clickSubmit}
             type='submit'
             fullWidth
+            size='large'
             variant='contained'
             color='primary'
-            className={classes.submit}
+            disabled={loading}
           >
             Sign In
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href='#' variant='body2'>
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link to='/signup' variant='body2'>
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
         </form>
+
+        <div className='auth-foot'>
+          <Link to='/signup'>{"Don't have an account? Sign Up"}</Link>
+        </div>
       </div>
-    </Container>
+    </div>
   );
 
   return (
-    <>
-      <Layout
-        title='Signin page'
-        description='Signin to MERN E-commerce App'
-        className='container col-md-8 offset-md-2'
-      >
-        {signInForm()}
-
-      </Layout>
-      <Copyright />
-    </>
+    <Layout
+      title='Signin page'
+      description='Signin to MERN E-commerce App'
+      crumb='Sign in'
+    >
+      {signInForm()}
+    </Layout>
   );
 }

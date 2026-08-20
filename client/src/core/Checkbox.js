@@ -15,18 +15,20 @@ const Checkbox = ({ categories, handleFilters }) => {
     } else {
       newCheckedCategoryId.splice(currentCategoryId, 1);
     }
-    // console.log(newCheckedCategoryId);
     setCheked(newCheckedCategoryId);
     handleFilters(newCheckedCategoryId);
   };
 
   return categories.map((c, i) => (
-    <li key={i} className='list-unstyled'>
+    <li key={i} className='filter-item'>
       <CheckboxM
+        id={`cat-${c._id}`}
+        size='small'
+        color='primary'
         onChange={handleToggle(c._id)}
         value={checked.indexOf(c._id === -1)}
       />
-      <label className='form-check-label'>{c.name}</label>
+      <label htmlFor={`cat-${c._id}`}>{c.name}</label>
     </li>
   ));
 };

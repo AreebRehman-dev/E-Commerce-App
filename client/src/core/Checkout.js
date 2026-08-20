@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import Button from '@material-ui/core/Button';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  getProducts,
   getBraintreeClientToken,
-  processPayment,
   createOrder,
 } from './apiCore';
 import { emptyCart } from './cartHelpers';
-import Card from './Card';
 import { isAuthenticated } from '../auth';
 import { Link } from 'react-router-dom';
 import DropIn from 'braintree-web-drop-in-react';
+
+import LockIcon from '@material-ui/icons/Lock';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 
 const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
   const [data, setData] = useState({
@@ -25,7 +25,7 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
   const userId = isAuthenticated() && isAuthenticated().user._id;
   const token = isAuthenticated() && isAuthenticated().token;
 
-  const getToken = (userId, token) => {
+  const getToken = useCallback((userId, token) => {
     getBraintreeClientToken(userId, token).then((data) => {
       if (data.error) {
         console.log(data.error);
@@ -35,11 +35,11 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
         setData({ clientToken: data.clientToken });
       }
     });
-  };
+  }, []);
 
   useEffect(() => {
     getToken(userId, token);
-  }, []);
+  }, [getToken, userId, token]);
 
   const handleAddress = (event) => {
     setData({ ...data, address: event.target.value });
@@ -51,14 +51,16 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
     }, 0);
   };
 
+  const itemCount = () =>
+    products.reduce((total, product) => total + Number(product.count || 0), 0);
+
   const showCheckout = () => {
     return isAuthenticated() ? (
       <div>{showDropIn()}</div>
     ) : (
-      <Link to='/signin'>
-        <Button variant='contained' color='primary'>
-          Sign in to checkout
-        </Button>
+      <Link className='btn-x btn-x--primary btn-x--block' to='/signin'>
+        <LockIcon />
+        Sign in to checkout
       </Link>
     );
   };
@@ -67,7 +69,6 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
 
   const buy = () => {
     setData({ loading: true });
-    let nonce;
 
     const createOrderData = {
       products: products,
@@ -96,26 +97,33 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
     <div onBlur={() => setData({ ...data, error: '' })}>
       {data.clientToken !== null && products.length > 0 ? (
         <div>
-          <div className='gorm-group mb-3'>
-            <label className='text-muted'>Delivery address:</label>
+          <div className='field'>
+            <label className='field-label' htmlFor='delivery-address'>
+              Delivery address
+            </label>
             <textarea
+              id='delivery-address'
               onChange={handleAddress}
-              className='form-control'
+              className='textarea'
               value={data.address}
               placeholder='Type your delivery address here...'
             />
           </div>
 
-          <DropIn
-            options={{
-              authorization: data.clientToken,
-              paypal: {
-                flow: 'vault',
-              },
-            }}
-            onInstance={(instance) => (data.instance = instance)}
-          />
-          <button onClick={buy} className='btn btn-success btn-block'>
+          <div className='dropin-wrap'>
+            <DropIn
+              options={{
+                authorization: data.clientToken,
+                paypal: {
+                  flow: 'vault',
+                },
+              }}
+              onInstance={(instance) => (data.instance = instance)}
+            />
+          </div>
+
+          <button onClick={buy} type='button' className='btn-x btn-x--success btn-x--block btn-x--lg'>
+            <LockIcon />
             Pay
           </button>
         </div>
@@ -123,30 +131,41 @@ const Checkout = ({ products, setRun = (f) => f, run = undefined }) => {
     </div>
   );
 
-  const showError = (error) => (
-    <div
-      className='alert alert-danger'
-      style={{ display: error ? '' : 'none' }}
-    >
-      {error}
-    </div>
-  );
+  const showError = (error) =>
+    error ? (
+      <div className='notice notice--error'>
+        <ErrorOutlineIcon />
+        <p>{error}</p>
+      </div>
+    ) : null;
 
-  const showSuccess = (success) => (
-    <div
-      className='alert alert-info'
-      style={{ display: success ? '' : 'none' }}
-    >
-      Thanks! Your payment was successful!
-    </div>
-  );
+  const showSuccess = (success) =>
+    success ? (
+      <div className='notice notice--success'>
+        <CheckCircleIcon />
+        <p>Thanks! Your payment was successful!</p>
+      </div>
+    ) : null;
 
   const showLoading = (loading) =>
-    loading && <h2 className='text-danger'>Loading...</h2>;
+    loading && (
+      <div className='notice notice--info'>
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div>
-      <h2>Total: ${getTotal()}</h2>
+      <div className='summary-row'>
+        <span className='k'>Items</span>
+        <span className='v'>{itemCount()}</span>
+      </div>
+
+      <div className='summary-total'>
+        <span>Total:</span>
+        <strong>${getTotal()}</strong>
+      </div>
+
       {showLoading(data.loading)}
       {showSuccess(data.success)}
       {showError(data.error)}

@@ -1,7 +1,12 @@
 import React from 'react';
 import Layout from '../core/Layout';
+import { Link } from 'react-router-dom';
 import { isAuthenticated } from '../auth';
 import { getCategories } from './apiAdmin';
+
+import CategoryIcon from '@material-ui/icons/Category';
+import AddIcon from '@material-ui/icons/Add';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const CategoryList = () => {
   const { user } = isAuthenticated();
@@ -26,22 +31,47 @@ const CategoryList = () => {
     <Layout
       title='Category List'
       description={`Hey ${user.name} ready to manage categories?`}
+      crumb='Categories'
+      actions={
+        <Link to='/admin/dashboard' className='btn-x btn-x--outline'>
+          <ArrowBackIcon />
+          Back to Dashboard
+        </Link>
+      }
     >
-      <div className='row div-main'>
-        <div className='col-md-8 offset-md-2 div-inner'>
-          <h2 className='text-center'>Total {categories.length} categories</h2>
-          <hr />
-          <ul className='list-group'>
+      <div className='section section--sm'>
+        <div className='shell shell--narrow' style={{ padding: 0 }}>
+          <div className='panel'>
+            <div className='panel-head'>
+              <h3>Total {categories.length} categories</h3>
+              <Link to='/create/category' className='btn-x btn-x--primary btn-x--sm'>
+                <AddIcon />
+                Add Category
+              </Link>
+            </div>
+
             {categories.length > 0 ? (
-              categories.map((c, i) => (
-                <li key={i} className='list-group-item'>
-                  {c.name}
-                </li>
-              ))
+              <ul className='rowlist'>
+                {categories.map((c, i) => (
+                  <li key={i} className='rowitem'>
+                    <span className='rowitem-index'>{i + 1}</span>
+                    <span className='rowitem-main'>
+                      <span className='rowitem-title'>{c.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             ) : (
-              <h4 className='text-center'>No categories found</h4>
+              <div className='panel-body'>
+                <div className='empty' style={{ border: 0, padding: '32px 16px' }}>
+                  <span className='empty-icon'>
+                    <CategoryIcon />
+                  </span>
+                  <h3>No categories found</h3>
+                </div>
+              </div>
             )}
-          </ul>
+          </div>
         </div>
       </div>
     </Layout>
