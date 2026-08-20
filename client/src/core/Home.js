@@ -3,13 +3,28 @@ import Layout from './Layout';
 import { getProducts } from './apiCore';
 import Card from './Card';
 import Search from './Search';
-import 'fontsource-roboto';
-import Copyright from './Copyright';
+
+import NewReleasesIcon from '@material-ui/icons/NewReleases';
+import WhatshotIcon from '@material-ui/icons/Whatshot';
+
+const ProductSkeletons = ({ count = 3 }) => (
+  <div className='grid-products'>
+    {Array.from({ length: count }).map((_, i) => (
+      <div className='sk-card' key={i}>
+        <div className='sk sk-media' />
+        <div className='sk sk-line sk-line--lg' />
+        <div className='sk sk-line' />
+        <div className='sk sk-line sk-line--sm' />
+      </div>
+    ))}
+  </div>
+);
 
 const Home = () => {
   const [productsBySell, setProductsBySell] = useState([]);
   const [productsByArrival, setProductsByArrival] = useState([]);
   const [error, setError] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const loadProductsBySell = () => {
     getProducts('sold').then((data) => {
@@ -28,6 +43,7 @@ const Home = () => {
       } else {
         setProductsByArrival(data);
       }
+      setLoading(false);
     });
   };
 
@@ -36,41 +52,51 @@ const Home = () => {
     loadProductsBySell();
   }, []);
 
-  return (
-    <>
-      <Layout
-        title='Home page'
-        description='MERN E-commerce App'
-        className='container-fluid'
-      >
-        <Search />
-        <div className='row'>
-          <div className='col-md-1'></div>
-          <div className='col-md-10'>
-            <h2 className='mb-2 textcenter'>New Arrivals</h2>
-            <div className='row'>
-              {productsByArrival.map((product, i) => (
-                <div key={i} className='col-xl-4 col-lg-6 col-md-6 col-sm-12'>
-                  <Card product={product} />
-                </div>
-              ))}
-            </div>
+  const showError = () =>
+    error && error.length > 0 ? (
+      <div className='section section--sm'>
+        <div className='notice notice--error'>{error}</div>
+      </div>
+    ) : null;
 
-            <h2 className='mb-2 mt-4 textcenter'>Best Sellers</h2>
-            <div className='row'>
-              {productsBySell.map((product, i) => (
-                <div key={i} className='col-xl-4 col-lg-6 col-md-6 col-sm-12'>
-                  <Card product={product} />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className='col-md-1'></div>
+  const productSection = (heading, icon, items) => (
+    <section className='section'>
+      <div className='section-head'>
+        <h2 className='section-title'>{heading}</h2>
+        {!loading && items.length > 0 && (
+          <span className='chip chip--brand'>
+            {icon}
+            {items.length} products
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <ProductSkeletons />
+      ) : items.length > 0 ? (
+        <div className='grid-products fade-in'>
+          {items.map((product, i) => (
+            <Card key={i} product={product} />
+          ))}
         </div>
+      ) : (
+        <div className='empty'>
+          <span className='empty-icon'>{icon}</span>
+          <h3>No products to show</h3>
+        </div>
+      )}
+    </section>
+  );
 
-      </Layout>
-      <Copyright />
-    </>
+  return (
+    <Layout title='Home page' description='MERN E-commerce App' hero>
+      <Search />
+
+      {showError()}
+
+      {productSection('New Arrivals', <NewReleasesIcon />, productsByArrival)}
+      {productSection('Best Sellers', <WhatshotIcon />, productsBySell)}
+    </Layout>
   );
 };
 

@@ -4,6 +4,11 @@ import { isAuthenticated } from '../auth';
 import { Link } from 'react-router-dom';
 import { createCategory } from './apiAdmin';
 
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import AddIcon from '@material-ui/icons/Add';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+
 const AddCategory = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState(false);
@@ -34,52 +39,74 @@ const AddCategory = () => {
 
   const newCategoryForm = () => (
     <form onSubmit={clickSubmit}>
-      <div className='form-group'>
-        <label className='text-muted'>Name</label>
+      <div className='field'>
+        <label className='field-label' htmlFor='category-name'>
+          Name
+        </label>
         <input
+          id='category-name'
           type='text'
-          className='form-control'
+          className='input'
           onChange={handleChange}
           value={name}
           autoFocus
           required
         />
       </div>
-      <button className='btn btn-outline-primary'>Create Category</button>
+      <button className='btn-x btn-x--primary'>
+        <AddIcon />
+        Create Category
+      </button>
     </form>
   );
 
   const showSuccess = () => {
     if (success) {
-      return <h3 className='text-success'>{name} is created</h3>;
+      return (
+        <div className='notice notice--success'>
+          <CheckCircleIcon />
+          <p>{name} is created</p>
+        </div>
+      );
     }
   };
 
   const showError = () => {
     if (error) {
-      return <h3 className='text-danger'>Category should be unique</h3>;
+      return (
+        <div className='notice notice--error'>
+          <ErrorOutlineIcon />
+          <p>Category should be unique</p>
+        </div>
+      );
     }
   };
 
   const goBack = () => (
-    <div className='mt-5'>
-      <Link to='/admin/dashboard' className='text-warning'>
-        Back to Dashboard
-      </Link>
-    </div>
+    <Link to='/admin/dashboard' className='btn-x btn-x--outline'>
+      <ArrowBackIcon />
+      Back to Dashboard
+    </Link>
   );
 
   return (
     <Layout
       title='Add a new category'
       description={`Hey ${user.name}, ready to add a new category?`}
+      crumb='Add category'
+      actions={goBack()}
     >
-      <div className='row div-main'>
-        <div className='col-md-8 offset-md-2 div-inner'>
+      <div className='section section--sm'>
+        <div className='shell shell--narrow' style={{ padding: 0 }}>
           {showSuccess()}
           {showError()}
-          {newCategoryForm()}
-          {goBack()}
+
+          <div className='panel'>
+            <div className='panel-head'>
+              <h3>New category</h3>
+            </div>
+            <div className='panel-body'>{newCategoryForm()}</div>
+          </div>
         </div>
       </div>
     </Layout>

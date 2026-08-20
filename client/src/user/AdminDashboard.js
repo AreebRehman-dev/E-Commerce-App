@@ -3,70 +3,95 @@ import Layout from '../core/Layout';
 import { isAuthenticated } from '../auth';
 import { Link } from 'react-router-dom';
 
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
+import AddBoxIcon from '@material-ui/icons/AddBox';
+import ReceiptIcon from '@material-ui/icons/Receipt';
+import SettingsIcon from '@material-ui/icons/Settings';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+
+const adminNav = [
+  { to: '/admin/categories', label: 'Category List', icon: <ListAltIcon /> },
+  { to: '/create/category', label: 'Add Category', icon: <CreateNewFolderIcon /> },
+  { to: '/create/product', label: 'Add Product', icon: <AddBoxIcon /> },
+  { to: '/admin/orders', label: 'View Orders', icon: <ReceiptIcon /> },
+  { to: '/admin/products', label: 'Manage Products', icon: <SettingsIcon /> },
+];
+
 const AdminDashboard = () => {
   const {
-    user: { _id, name, email, role },
+    user: { name, email, role },
   } = isAuthenticated();
+
+  const initials = (name || '?').trim().charAt(0).toUpperCase();
 
   const adminLinks = () => {
     return (
-      <div className='card'>
-        <h4 className='card-header'>Admin Links</h4>
-        <ul className='list-group'>
-          <li className='list-group-item'>
-            <Link className='nav-link' to='/admin/categories'>
-              Category List
+      <div className='panel panel--sticky'>
+        <div className='panel-head'>
+          <h4>Admin Links</h4>
+        </div>
+        <nav className='sidenav'>
+          {adminNav.map((item) => (
+            <Link className='sidenav-link' to={item.to} key={item.to}>
+              {item.icon}
+              {item.label}
+              <ChevronRightIcon className='arrow' />
             </Link>
-          </li>
-          <li className='list-group-item'>
-            <Link className='nav-link' to='/create/category'>
-              Add Category
-            </Link>
-          </li>
-          <li className='list-group-item'>
-            <Link className='nav-link' to='/create/product'>
-              Add Product
-            </Link>
-          </li>
-          <li className='list-group-item'>
-            <Link className='nav-link' to='/admin/orders'>
-              View Orders
-            </Link>
-          </li>
-          <li className='list-group-item'>
-            <Link className='nav-link' to='/admin/products'>
-              Manage Products
-            </Link>
-          </li>
-        </ul>
+          ))}
+        </nav>
       </div>
     );
   };
 
   const adminInfo = () => {
     return (
-      <div className='card mb-5'>
-        <h3 className='card-header'>User information</h3>
-        <ul className='list-group'>
-          <li className='list-group-item'>{name}</li>
-          <li className='list-group-item'>{email}</li>
-          <li className='list-group-item'>
+      <div className='panel'>
+        <div className='panel-head'>
+          <h3>User information</h3>
+          <span className={`chip ${role === 1 ? 'chip--brand' : 'chip--off'}`}>
+            <VerifiedUserIcon />
             {role === 1 ? 'Admin' : 'Registered user'}
-          </li>
-        </ul>
+          </span>
+        </div>
+
+        <div className='profile-card'>
+          <span className='avatar-lg'>{initials}</span>
+          <span>
+            <span className='name'>{name}</span>
+            <span className='mail'>{email}</span>
+          </span>
+        </div>
       </div>
     );
   };
 
+  const shortcuts = () => (
+    <div className='stat-grid'>
+      {adminNav.map((item) => (
+        <Link className='stat' to={item.to} key={item.to}>
+          <span className='stat-icon'>{item.icon}</span>
+          <span>
+            <span className='stat-value' style={{ fontSize: '1rem' }}>
+              {item.label}
+            </span>
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
-    <Layout
-      title='Dashboard'
-      description={`${name}`}
-      className='container-fluid'
-    >
-      <div className='row'>
-        <div className='col-md-3'>{adminLinks()}</div>
-        <div className='col-md-9'>{adminInfo()}</div>
+    <Layout title='Dashboard' description={`${name}`} crumb='Dashboard'>
+      <div className='section section--sm'>
+        <div className='dash-layout'>
+          <div>{adminLinks()}</div>
+          <div className='stack-lg'>
+            {shortcuts()}
+            {adminInfo()}
+          </div>
+        </div>
       </div>
     </Layout>
   );

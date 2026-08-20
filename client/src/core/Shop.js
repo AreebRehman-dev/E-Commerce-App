@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './Layout';
-import Button from '@material-ui/core/Button';
 import Card from './Card';
 import { getCategories, getFilteredProducts } from './apiCore';
 import Checkbox from './Checkbox';
 import RadioBox from './RadioBox';
-import { makeStyles } from '@material-ui/core/styles';
-
 import Search from './Search';
 import { prices } from './fixedPrices';
-import Copyright from './Copyright';
+
+import TuneIcon from '@material-ui/icons/Tune';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Inventory2Icon from '@material-ui/icons/Category';
 
 const Shop = () => {
   const [myFilters, setMyFilters] = useState({
@@ -18,7 +18,7 @@ const Shop = () => {
 
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(false);
-  const [limit, setLimit] = useState(6);
+  const [limit] = useState(6);
   const [skip, setSkip] = useState(0);
   const [size, setSize] = useState(0);
   const [filteredResults, setFilteredResults] = useState([]);
@@ -34,7 +34,6 @@ const Shop = () => {
   };
 
   const loadFilteredResults = (newFilters) => {
-    // console.log(newFilters);
     getFilteredProducts(skip, limit, newFilters).then((data) => {
       if (data.error) {
         setError(data.error);
@@ -48,7 +47,6 @@ const Shop = () => {
 
   const loadMore = () => {
     let toSkip = skip + limit;
-    // console.log(newFilters);
     getFilteredProducts(toSkip, limit, myFilters.filters).then((data) => {
       if (data.error) {
         setError(data.error);
@@ -60,41 +58,30 @@ const Shop = () => {
     });
   };
 
-  const useStyles = makeStyles((theme) => ({
-    btn: {
-      background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-      borderRadius: 3,
-      border: 0,
-      color: 'white',
-      height: 48,
-      padding: '0 20px',
-      boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
-    },
-  }));
-
-  const classes = useStyles();
-
   const loadMoreButton = () => {
     return (
       size > 0 &&
       size >= limit && (
-        // <button onClick={loadMore} className='btn btn-warning mb-5'>
-        //   Load more
-        // </button>
-        <Button onClick={loadMore} variant='contained' className={classes.btn}>
-          Load more
-        </Button>
+        <div className='u-center' style={{ marginTop: 36 }}>
+          <button type='button' onClick={loadMore} className='btn-x btn-x--dark btn-x--lg'>
+            Load more
+            <ExpandMoreIcon />
+          </button>
+        </div>
       )
     );
   };
 
+  // Deliberately mount-only. Listing `loadFilteredResults` here would re-run
+  // this effect whenever `skip` changes, and since it resets `skip` to 0 that
+  // would undo every "Load more" the moment it completed.
   useEffect(() => {
     init();
     loadFilteredResults(skip, limit, myFilters.filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFilters = (filters, filterBy) => {
-    // console.log("SHOP", filters, filterBy);
     const newFilters = { ...myFilters };
     newFilters.filters[filterBy] = filters;
 
@@ -119,49 +106,82 @@ const Shop = () => {
   };
 
   return (
-    <>
-      <Layout
-        title='Shop page'
-        description='Search and find books'
-        className='container-fluid'
-      >
-        <Search />
-        <div className='row'>
-          <div className='col-md-3'>
-            <h4>Filter by categories</h4>
-            <ul>
-              <Checkbox
-                categories={categories}
-                handleFilters={(filters) => handleFilters(filters, 'category')}
-              />
-            </ul>
+    <Layout title='Shop page' description='Search and find books'>
+      <Search />
 
-            <h4>Filter by price range</h4>
-            <div>
-              <RadioBox
-                prices={prices}
-                handleFilters={(filters) => handleFilters(filters, 'price')}
-              />
-            </div>
-          </div>
-
-          <div className='col-md-9'>
-            <h2 className='mb-2'>Products</h2>
-            <div className='row'>
-              {filteredResults.map((product, i) => (
-                <div key={i} className='col-xl-4 col-lg-6 col-md-12 col-sm-12'>
-                  <Card product={product} />
-                </div>
-              ))}
-            </div>
-            <hr />
-            {loadMoreButton()}
-          </div>
+      {error && (
+        <div className='section section--sm'>
+          <div className='notice notice--error'>{error}</div>
         </div>
+      )}
 
-      </Layout>
-      <Copyright />
-    </>
+      <div className='section'>
+        <div className='shop-layout'>
+          <aside className='panel panel--sticky'>
+            <div className='panel-head'>
+              <h4>
+                <span className='u-flex'>
+                  <TuneIcon style={{ fontSize: 19, opacity: 0.6 }} />
+                  Filters
+                </span>
+              </h4>
+            </div>
+
+            <div className='panel-body'>
+              <div className='filter-group'>
+                <h5 className='filter-title'>Filter by categories</h5>
+                <ul className='filter-list'>
+                  <Checkbox
+                    categories={categories}
+                    handleFilters={(filters) => handleFilters(filters, 'category')}
+                  />
+                </ul>
+              </div>
+
+              <div className='filter-group'>
+                <h5 className='filter-title'>Filter by price range</h5>
+                <div className='filter-list'>
+                  <RadioBox
+                    prices={prices}
+                    handleFilters={(filters) => handleFilters(filters, 'price')}
+                  />
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <section>
+            <div className='section-head' style={{ marginBottom: 22 }}>
+              <h2 className='section-title'>Products</h2>
+              {filteredResults.length > 0 && (
+                <span className='chip chip--brand'>
+                  <Inventory2Icon />
+                  {filteredResults.length} shown
+                </span>
+              )}
+            </div>
+
+            {filteredResults.length > 0 ? (
+              <div className='grid-products grid-products--tight fade-in'>
+                {filteredResults.map((product, i) => (
+                  <Card key={i} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className='empty'>
+                <span className='empty-icon'>
+                  <TuneIcon />
+                </span>
+                <h3>No products match these filters</h3>
+                <p>Clear a filter or pick a wider price range to see more results.</p>
+              </div>
+            )}
+
+            {loadMoreButton()}
+          </section>
+        </div>
+      </div>
+    </Layout>
   );
 };
 

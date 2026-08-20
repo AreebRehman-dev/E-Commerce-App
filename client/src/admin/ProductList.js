@@ -1,7 +1,12 @@
 import React from 'react';
 import Layout from '../core/Layout';
+import { Link } from 'react-router-dom';
 import { isAuthenticated } from '../auth';
 import { getProducts } from './apiAdmin';
+
+import Inventory2Icon from '@material-ui/icons/Category';
+import AddIcon from '@material-ui/icons/Add';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const ProductList = () => {
   const { user } = isAuthenticated();
@@ -25,22 +30,47 @@ const ProductList = () => {
     <Layout
       title='Product List'
       description={`Hey ${user.name} ready to manage products?`}
+      crumb='Products'
+      actions={
+        <Link to='/admin/dashboard' className='btn-x btn-x--outline'>
+          <ArrowBackIcon />
+          Back to Dashboard
+        </Link>
+      }
     >
-      <div className='row'>
-        <div className='col-md-8 offset-md-2'>
-          <h2 className='text-center'>Total {products.length} products</h2>
-          <hr />
-          <ul className='list-group'>
+      <div className='section section--sm'>
+        <div className='shell shell--narrow' style={{ padding: 0 }}>
+          <div className='panel'>
+            <div className='panel-head'>
+              <h3>Total {products.length} products</h3>
+              <Link to='/create/product' className='btn-x btn-x--primary btn-x--sm'>
+                <AddIcon />
+                Add Product
+              </Link>
+            </div>
+
             {products.length > 0 ? (
-              products.map((p, i) => (
-                <li key={i} className='list-group-item'>
-                  {p.name}
-                </li>
-              ))
+              <ul className='rowlist'>
+                {products.map((p, i) => (
+                  <li key={i} className='rowitem'>
+                    <span className='rowitem-index'>{i + 1}</span>
+                    <span className='rowitem-main'>
+                      <span className='rowitem-title'>{p.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             ) : (
-              <h4 className='text-center'>No products found</h4>
+              <div className='panel-body'>
+                <div className='empty' style={{ border: 0, padding: '32px 16px' }}>
+                  <span className='empty-icon'>
+                    <Inventory2Icon />
+                  </span>
+                  <h3>No products found</h3>
+                </div>
+              </div>
             )}
-          </ul>
+          </div>
         </div>
       </div>
     </Layout>
